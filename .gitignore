@@ -1,2 +1,5 @@
 .env
 .venv
+img/
+credentials.json
+credentials_OAuth2.json
