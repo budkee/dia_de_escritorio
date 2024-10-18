@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>Transcreve pra mim</title>
+    <style>
+        .center-form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div class="container center-form">
+        <div class="col-md-6">
+            <h1 class="text-center mb-4">Transcreve pra mim</h1>
+            <form id="uploadForm">
+                <div class="mb-3">
+                    <label for="audioFile" class="form-label">Escolha um arquivo de áudio</label>
+                    <input class="form-control" type="file" id="audioFile" accept="audio/*" required>
+                </div>
+                <button type="button" class="btn btn-primary w-100" onclick="transcribeAudio()">Transcrever Áudio</button>
+            </form>
+            <div class="mt-4" id="transcriptionResult" style="display: none;">
+                <h3>Transcrição</h3>
+                <pre id="transcriptionText"></pre>
+                <button class="btn btn-success w-100" onclick="downloadText()">Baixar Transcrição</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Popper e JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    
+    <!-- JavaScript para interação -->
+    <script>
+        async function transcribeAudio() {
+            const fileInput = document.getElementById('audioFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Por favor, selecione um arquivo de áudio.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/uploads', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('transcriptionText').textContent = result.transcription;
+                    document.getElementById('transcriptionResult').style.display = 'block';
+                } else {
+                    alert('Erro na transcrição: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro na transcrição.');
+            }
+        }
+
+        function downloadText() {
+            const text = document.getElementById('transcriptionText').textContent;
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'transcricao.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
