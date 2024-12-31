@@ -5,7 +5,7 @@
 # Alterar a mensagem conforme o que foi feito no dia 
 
 git add .
-git commit -m "Requisitos | Transcrição de entrevista #01"
+git commit -m "Ecommerce | SEO e SKU"
 echo "\n"
 git push
 echo "\n"
